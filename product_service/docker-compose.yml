@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    container_name: product_service-web
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: >
+      sh -c "
+      ./wait-for-it.sh db:5432 -- &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+
+  db:
+    image: postgres:15
+    container_name: product_service-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: product_service_db
+    ports:
+      - "5432:5432"
